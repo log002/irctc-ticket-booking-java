@@ -1,0 +1,61 @@
+[
+  {
+    "name": "sid",
+    "user_id": "abcdefgh",
+    "password": "12345",
+    "hashed_password": "$2a$10$MqonEcizso4Re9iFEMajHOIHCUd5O3Q.XZX779C50ZnC/Hb6mirwW",
+    "tickets_booked": [
+      {
+        "ticket_id": "your_ticket_id",
+        "user_id": "abcdefgh",
+        "source": "Bangalore",
+        "destination": "Delhi",
+        "date_of_travel": null,
+        "train_id": null,
+        "train_num": null,
+        "row": 0,
+        "seat": 0,
+        "ticket_info": "Ticket ID: your_ticket_id | User: abcdefgh | Train: null | From: Bangalore | To: Delhi | Date: null | Seat: Row 0, Column 0"
+      }
+    ]
+  },
+  {
+    "name": "rahul",
+    "user_id": "fe46da4d-c8d1-4229-97e6-600dce6941e8",
+    "password": "hhbb11",
+    "hashed_password": "$2a$10$O/OWE.xh3gttMANiM4BIX.mo.4/myik1J739DZ25ecVENk8xhMCW2",
+    "tickets_booked": []
+  },
+  {
+    "name": "sam",
+    "user_id": "869764fe-45bc-4923-a527-6ed415654b3b",
+    "password": "sam123",
+    "hashed_password": "$2a$10$ZytOm3AL18xyNVFap9ugUOIpb4JoC8X5p7H5RmKnq6CZ9SaYHqbli",
+    "tickets_booked": [
+      {
+        "ticket_id": "28a2944a-7e49-4e27-a462-94ff3ddfbf47",
+        "user_id": "869764fe-45bc-4923-a527-6ed415654b3b",
+        "source": "bangalore",
+        "destination": "jaipur",
+        "date_of_travel": "2026-09-11",
+        "train_id": "bacs",
+        "train_num": null,
+        "row": 0,
+        "seat": 2,
+        "ticket_info": "Ticket ID: 28a2944a-7e49-4e27-a462-94ff3ddfbf47 | User: 869764fe-45bc-4923-a527-6ed415654b3b | Train: bacs | From: bangalore | To: jaipur | Date: 2026-09-11 | Seat: Row 0, Column 2"
+      },
+      {
+        "ticket_id": "468d8291-266f-45fb-a9e0-73c62cb7170d",
+        "user_id": "869764fe-45bc-4923-a527-6ed415654b3b",
+        "source": "bangalore",
+        "destination": "delhi",
+        "date_of_travel": "2026-09-12",
+        "train_id": "bacs",
+        "train_num": null,
+        "row": 0,
+        "seat": 3,
+        "ticket_info": "Ticket ID: 468d8291-266f-45fb-a9e0-73c62cb7170d | User: 869764fe-45bc-4923-a527-6ed415654b3b | Train: bacs | From: bangalore | To: delhi | Date: 2026-09-12 | Seat: Row 0, Column 3"
+      }
+    ]
+  }
+]
