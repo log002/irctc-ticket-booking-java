@@ -3,6 +3,7 @@ package ticket.booking.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import ticket.booking.TestDataFactory;
 import ticket.booking.entities.Ticket;
 import ticket.booking.entities.Train;
 import ticket.booking.entities.User;
@@ -482,25 +483,9 @@ class UserBookingServiceTest {
 
         Files.writeString(trainsFile, trainJson);
 
-        User user = new User(
-                "Sadek",
-                "user-001",
-                "password123",
-                UserServiceUtil.hashPassword("password123"),
-                new ArrayList<>()
-        );
+        User user = TestDataFactory.createUser();
 
-        Ticket ticket = new Ticket(
-                "ticket-001",
-                "user-001",
-                "bangalore",
-                "delhi",
-                "2026-09-11",
-                "bacs",
-                null,
-                1,
-                1
-        );
+        Ticket ticket = TestDataFactory.createTicket();
 
         user.getTicketsBooked().add(ticket);
 
