@@ -19,19 +19,51 @@ public class UserBookingService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String USERS_PATH = "D:/My_Workspace/Java/IRCTC/app/src/main/java/ticket/booking/localDB/users.json";
+    private final TrainService trainService;
+
+    private final String usersPath;
 
     public UserBookingService() throws IOException{
+        this.usersPath = "D:/My_Workspace/Java/IRCTC/app/src/main/java/ticket/booking/localDB/users.json";
+        this.trainService = new TrainService();
         loadUserListFromFile();
     }
 
     public UserBookingService(User user) throws IOException {
         this.user = user;
+        this.usersPath = "D:/My_Workspace/Java/IRCTC/app/src/main/java/ticket/booking/localDB/users.json";
+        this.trainService = new TrainService();
+        loadUserListFromFile();
+    }
+
+    public UserBookingService(String usersPath) throws IOException{
+        this.usersPath = usersPath;
+        this.trainService = new TrainService();
+        loadUserListFromFile();
+    }
+
+    public UserBookingService(User user, String usersPath) throws IOException{
+        this.user = user;
+        this.usersPath = usersPath;
+        this.trainService = new TrainService();
+        loadUserListFromFile();
+    }
+
+    public UserBookingService(String usersPath, TrainService trainService) throws IOException {
+        this.usersPath = usersPath;
+        this.trainService = trainService;
+        loadUserListFromFile();
+    }
+
+    public UserBookingService(User user, String usersPath, TrainService trainService) throws IOException {
+        this.user = user;
+        this.usersPath = usersPath;
+        this.trainService = trainService;
         loadUserListFromFile();
     }
 
     private void loadUserListFromFile() throws IOException{
-        userList = objectMapper.readValue(new File(USERS_PATH), new TypeReference<List<User>>() {});
+        userList = objectMapper.readValue(new File(usersPath), new TypeReference<List<User>>() {});
     }
 
     public Boolean loginUser(){
@@ -57,7 +89,7 @@ public class UserBookingService {
     }
 
     private void saveUserListToFile() throws IOException{
-        File userFile = new File(USERS_PATH);
+        File userFile = new File(usersPath);
         objectMapper.writeValue(userFile, userList);
     }
 
@@ -94,8 +126,6 @@ public class UserBookingService {
         Ticket ticket = ticketToCancel.get();
 
         try{
-          TrainService trainService = new TrainService();
-
           Optional<Train> train = trainService.getTrainById(ticket.getTrainId());
 
           if(train.isEmpty()){
@@ -141,12 +171,7 @@ public class UserBookingService {
     }
 
     public List<Train> getTrains(String source, String dest){
-        try{
-            TrainService trainService = new TrainService();
-            return trainService.searchTrains(source, dest);
-        }catch(IOException ex){
-            return new ArrayList<>();
-        }
+        return trainService.searchTrains(source, dest);
     }
 
     public List<List<Integer>> fetchSeats(Train train){
@@ -155,8 +180,6 @@ public class UserBookingService {
 
     public Boolean bookTrainSeat(Train train, int row, int seat, String source, String dest, String dateOfTravel){
         try {
-            TrainService trainService = new TrainService();
-
             List<List<Integer>> seats = train.getSeats();
 
             if (row >= 0 && row < seats.size() && seat >= 0 &&

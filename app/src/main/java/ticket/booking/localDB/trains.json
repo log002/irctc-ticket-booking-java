@@ -16,9 +16,9 @@
     "seats": [
       [
         1,
-        1,
-        1,
-        1,
+        0,
+        0,
+        0,
         0,
         0
       ],
@@ -49,19 +49,21 @@
     ]
   },
   {
-    "train_id": "bacs",
+    "train_id": "abcd",
     "train_num": null,
     "station_times": {
       "bangalore": "13:50:00",
-      "jaipur": "13:50:00",
-      "delhi": "13:50:00"
+      "pune": "13:50:00",
+      "mumbai": "13:50:00",
+      "allahabad": "21:40:00"
     },
     "stations": [
       "bangalore",
-      "jaipur",
-      "delhi"
+      "pune",
+      "mumbai",
+      "allahabad"
     ],
-    "train_info": "Train ID: bacs Train No: null",
+    "train_info": "Train ID: abcd Train No: null",
     "seats": [
       [
         0,

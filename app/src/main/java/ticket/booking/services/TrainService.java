@@ -16,13 +16,26 @@ public class TrainService {
 
     private List<Train> trainList;
 
-    private static final String TRAINS_PATH = "D:/My_Workspace/Java/IRCTC/app/src/main/java/ticket/booking/localDB/trains.json";
+    private final String trainsPath;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public TrainService() throws IOException{
-        File trains = new File(TRAINS_PATH);
-        trainList = objectMapper.readValue(trains, new TypeReference<List<Train>>() {});
+        this.trainsPath = "D:/My_Workspace/Java/IRCTC/app/src/main/java/ticket/booking/localDB/trains.json";
+        loadTrainListFromFile();
+    }
+
+    public TrainService(String trainsPath) throws IOException{
+        this.trainsPath = trainsPath;
+        loadTrainListFromFile();
+    }
+
+    private void loadTrainListFromFile() throws IOException{
+        File trains = new File(trainsPath);
+        trainList = objectMapper.readValue(
+                trains,
+                new TypeReference<List<Train>>() {}
+        );
     }
 
     public List<Train> searchTrains(String source, String dest) {
@@ -61,7 +74,7 @@ public class TrainService {
 
     private void saveTrainListToFile(){
         try{
-            objectMapper.writeValue(new File(TRAINS_PATH), trainList);
+            objectMapper.writeValue(new File(trainsPath), trainList);
         }catch (IOException ex){
             ex.printStackTrace();
         }

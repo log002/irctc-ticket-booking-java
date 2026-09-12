@@ -17,7 +17,11 @@ repositories {
 
 dependencies {
     // Use JUnit test framework.
-    testImplementation libs.junit
+    testImplementation ("org.junit.jupiter:junit-jupiter:5.12.2")
+    testRuntimeOnly ("org.junit.platform:junit-platform-launcher:1.12.2")
+
+    // mockito
+    testImplementation ("org.mockito:mockito-core:5.18.0")
 
     // This dependency is used by the application.
     implementation libs.guava
@@ -36,4 +40,50 @@ java {
 application {
     // Define the main class for the application.
     mainClass = 'ticket.booking.App'
+}
+
+test{
+    useJUnitPlatform()
+
+    testLogging{
+        events "passed", "skipped", "failed"
+    }
+
+    def passed = 0
+    def failed = 0
+    def skipped = 0
+
+    addTestListener(new TestListener(){
+        void beforeSuite(TestDescriptor suite){}
+
+        void afterSuite(TestDescriptor suite, TestResult result){}
+
+        void beforeTest(TestDescriptor testDescriptor){}
+
+        void afterTest(TestDescriptor testDescriptor, TestResult testResult){
+            switch(testResult.resultType){
+                case TestResult.ResultType.SUCCESS:
+                    passed++
+                    break
+                case TestResult.ResultType.FAILURE:
+                    failed++
+                    break
+                case TestResult.ResultType.SKIPPED:
+                    skipped++
+                    break
+            }
+        }
+    })
+
+    doLast{
+        println ""
+        println "========================================"
+        println "TEST SUMMARY"
+        println "========================================"
+        println "Passed : ${passed}"
+        println "Failed : ${failed}"
+        println "Skipped: ${skipped}"
+        println "Total  : ${passed + failed + skipped}"
+        println "========================================"
+    }
 }
