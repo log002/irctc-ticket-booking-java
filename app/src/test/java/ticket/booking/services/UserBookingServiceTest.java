@@ -513,4 +513,203 @@ class UserBookingServiceTest {
         assertEquals(0,
                 updatedTrain.getSeats().get(1).get(1));
     }
+
+    @Test
+    void shouldRejectCancellationForUnknownTicket() throws IOException {
+
+        Path trainsFile = tempDir.resolve("trains.json");
+
+        String trainJson = """
+            [
+              {
+                "train_id": "bacs",
+                "train_num": null,
+                "station_times": {
+                  "bangalore": "13:50:00",
+                  "jaipur": "13:50:00",
+                  "delhi": "13:50:00"
+                },
+                "stations": [
+                  "bangalore",
+                  "jaipur",
+                  "delhi"
+                ],
+                "seats": [
+                  [1, 0, 0, 0, 0, 0],
+                  [0, 1, 0, 0, 0, 0],
+                  [0, 0, 1, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0]
+                ]
+              }
+            ]
+            """;
+
+        Files.writeString(trainsFile, trainJson);
+
+        User user = TestDataFactory.createUser();
+
+        Ticket ticket = TestDataFactory.createTicket();
+        user.getTicketsBooked().add(ticket);
+
+        TrainService trainService =
+                new TrainService(trainsFile.toString());
+
+        UserBookingService bookingService =
+                new UserBookingService(
+                        user,
+                        usersFile.toString(),
+                        trainService
+                );
+
+        boolean cancelled =
+                bookingService.cancelBooking("unknown-ticket");
+
+        assertFalse(cancelled);
+
+        // Existing ticket must remain
+        assertEquals(1, user.getTicketsBooked().size());
+
+        // Seat must remain booked
+        Train train = trainService
+                .getTrainById("bacs")
+                .orElseThrow();
+
+        assertEquals(1, train.getSeats().get(1).get(1));
+    }
+
+    @Test
+    void shouldRejectCancellationWhenTrainDoesNotExist() throws IOException {
+
+        Path trainsFile = tempDir.resolve("trains.json");
+
+        // Empty train database
+        Files.writeString(trainsFile, "[]");
+
+        User user = TestDataFactory.createUser();
+
+        Ticket ticket = TestDataFactory.createTicket();
+        user.getTicketsBooked().add(ticket);
+
+        TrainService trainService =
+                new TrainService(trainsFile.toString());
+
+        UserBookingService bookingService =
+                new UserBookingService(
+                        user,
+                        usersFile.toString(),
+                        trainService
+                );
+
+        boolean cancelled =
+                bookingService.cancelBooking("ticket-001");
+
+        assertFalse(cancelled);
+
+        // Ticket should remain because cancellation failed
+        assertEquals(1, user.getTicketsBooked().size());
+
+        assertEquals(
+                "ticket-001",
+                user.getTicketsBooked().get(0).getTicketId()
+        );
+    }
+
+    @Test
+    void shouldRejectCancellationForInvalidSeatInformation() throws IOException {
+
+        Path trainsFile = tempDir.resolve("trains.json");
+
+        String trainJson = """
+            [
+              {
+                "train_id": "bacs",
+                "train_num": null,
+                "station_times": {
+                  "bangalore": "13:50:00",
+                  "jaipur": "13:50:00",
+                  "delhi": "13:50:00"
+                },
+                "stations": [
+                  "bangalore",
+                  "jaipur",
+                  "delhi"
+                ],
+                "seats": [
+                  [1, 0, 0, 0, 0, 0],
+                  [0, 1, 0, 0, 0, 0],
+                  [0, 0, 1, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0]
+                ]
+              }
+            ]
+            """;
+
+        Files.writeString(trainsFile, trainJson);
+
+        User user = TestDataFactory.createUser();
+
+        Ticket ticket = new Ticket(
+                "ticket-invalid-seat",
+                "user-001",
+                "bangalore",
+                "delhi",
+                "2026-09-11",
+                "bacs",
+                null,
+                10,   // invalid row
+                1
+        );
+
+        user.getTicketsBooked().add(ticket);
+
+        TrainService trainService =
+                new TrainService(trainsFile.toString());
+
+        UserBookingService bookingService =
+                new UserBookingService(
+                        user,
+                        usersFile.toString(),
+                        trainService
+                );
+
+        boolean cancelled =
+                bookingService.cancelBooking("ticket-invalid-seat");
+
+        assertFalse(cancelled);
+
+        // Ticket must remain because cancellation failed
+        assertEquals(1, user.getTicketsBooked().size());
+
+        assertEquals(
+                "ticket-invalid-seat",
+                user.getTicketsBooked().get(0).getTicketId()
+        );
+    }
+
+    @Test
+    void shouldRejectCancellationForEmptyTicketId() throws IOException {
+
+        Path trainsFile = tempDir.resolve("trains.json");
+
+        Files.writeString(trainsFile, "[]");
+
+        TrainService trainService =
+                new TrainService(trainsFile.toString());
+
+        User user = TestDataFactory.createUser();
+
+        UserBookingService bookingService =
+                new UserBookingService(
+                        user,
+                        usersFile.toString(),
+                        trainService
+                );
+
+        boolean cancelled =
+                bookingService.cancelBooking("");
+
+        assertFalse(cancelled);
+
+        assertEquals(0, user.getTicketsBooked().size());
+    }
 }

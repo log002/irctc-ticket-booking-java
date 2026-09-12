@@ -145,6 +145,12 @@ public class UserBookingService {
 
             List<List<Integer>> seats = bookedTrain.getSeats();
 
+            if (row < 0 || row >= seats.size()
+                    || seat < 0
+                    || seat >= seats.get(row).size()) {
+                return Boolean.FALSE;
+            }
+
             seats.get(row).set(seat, 0);
             bookedTrain.setSeats(seats);
 
