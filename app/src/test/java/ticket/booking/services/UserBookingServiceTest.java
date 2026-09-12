@@ -3,6 +3,7 @@ package ticket.booking.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import ticket.booking.entities.Ticket;
 import ticket.booking.entities.Train;
 import ticket.booking.entities.User;
 import ticket.booking.utils.UserServiceUtil;
@@ -447,5 +448,84 @@ class UserBookingServiceTest {
 
         // No ticket should be created
         assertEquals(0, user.getTicketsBooked().size());
+    }
+
+    @Test
+    void shouldCancelBookingSuccessfully() throws IOException {
+
+        Path trainsFile = tempDir.resolve("trains.json");
+
+        String trainJson = """
+            [
+              {
+                "train_id":"bacs",
+                "train_num":null,
+                "station_times":{
+                  "bangalore":"13:50:00",
+                  "jaipur":"13:50:00",
+                  "delhi":"13:50:00"
+                },
+                "stations":[
+                  "bangalore",
+                  "jaipur",
+                  "delhi"
+                ],
+                "seats":[
+                  [1,0,0,0,0,0],
+                  [0,1,0,0,0,0],
+                  [0,0,1,0,0,0],
+                  [0,0,0,0,0,0]
+                ]
+              }
+            ]
+            """;
+
+        Files.writeString(trainsFile, trainJson);
+
+        User user = new User(
+                "Sadek",
+                "user-001",
+                "password123",
+                UserServiceUtil.hashPassword("password123"),
+                new ArrayList<>()
+        );
+
+        Ticket ticket = new Ticket(
+                "ticket-001",
+                "user-001",
+                "bangalore",
+                "delhi",
+                "2026-09-11",
+                "bacs",
+                null,
+                1,
+                1
+        );
+
+        user.getTicketsBooked().add(ticket);
+
+        TrainService trainService =
+                new TrainService(trainsFile.toString());
+
+        UserBookingService bookingService =
+                new UserBookingService(
+                        user,
+                        usersFile.toString(),
+                        trainService
+                );
+
+        boolean cancelled =
+                bookingService.cancelBooking("ticket-001");
+
+        assertTrue(cancelled);
+
+        assertEquals(0, user.getTicketsBooked().size());
+
+        Train updatedTrain = trainService
+                .getTrainById("bacs")
+                .orElseThrow();
+
+        assertEquals(0,
+                updatedTrain.getSeats().get(1).get(1));
     }
 }

@@ -103,13 +103,19 @@ public class UserBookingService {
     }
 
     public Boolean cancelBooking(){
+
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Enter the ticket id to cancel: ");
+
         String ticketId = sc.nextLine();
 
+        return cancelBooking(ticketId);
+    }
+
+    public Boolean cancelBooking(String ticketId) {
+
         if(ticketId == null || ticketId.isEmpty()){
-            System.out.println("Ticket ID cannot be null or empty");
             return Boolean.FALSE;
         }
 
@@ -119,53 +125,38 @@ public class UserBookingService {
                 .findFirst();
 
         if(ticketToCancel.isEmpty()){
-            System.out.println("No ticket found with ID " + ticketId);
             return Boolean.FALSE;
         }
 
         Ticket ticket = ticketToCancel.get();
 
         try{
-          Optional<Train> train = trainService.getTrainById(ticket.getTrainId());
 
-          if(train.isEmpty()){
-              System.out.println("Train not found for this ticket.");
-              return Boolean.FALSE;
-          }
+            Optional<Train> train = trainService.getTrainById(ticket.getTrainId());
 
-          Train bookedTrain = train.get();
+            if(train.isEmpty()){
+                return Boolean.FALSE;
+            }
 
-          int row = ticket.getRow();
-          int seat = ticket.getSeat();
+            Train bookedTrain = train.get();
 
-          List<List<Integer>> seats = bookedTrain.getSeats();
+            int row = ticket.getRow();
+            int seat = ticket.getSeat();
 
-          if(row < 0 || row >= seats.size() ||
-                seat < 0 || seat >= seats.get(row).size()){
-              System.out.println("Invalid seat information in ticket.");
-              return Boolean.FALSE;
-          }
+            List<List<Integer>> seats = bookedTrain.getSeats();
 
-          // relase the booked seat
-          seats.get(row).set(seat, 0);
-          bookedTrain.setSeats(seats);
+            seats.get(row).set(seat, 0);
+            bookedTrain.setSeats(seats);
 
-          // save updated train
-          trainService.updateTrain(bookedTrain);
+            trainService.updateTrain(bookedTrain);
 
-          // remove ticket from user
-          this.user.getTicketsBooked().remove(ticket);
+            this.user.getTicketsBooked().remove(ticket);
 
-          // save updated user list
-          saveUserListToFile();
+            saveUserListToFile();
 
-          System.out.println("Ticket with ID " + ticketId + " has been cancelled.");
-          System.out.println("Seat row " + row + ", column " + seat + " is now available.");
-
-          return Boolean.TRUE;
+            return Boolean.TRUE;
 
         }catch(IOException ex){
-            System.out.println("Unable to cancel booking");
             return Boolean.FALSE;
         }
     }
